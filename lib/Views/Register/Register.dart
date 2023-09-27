@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:home_automation_system/Utils/Colors.dart';
+import 'package:home_automation_system/Utils/Functions.dart';
+import 'package:http/http.dart' as http;
+
+import '../Login/Login.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -17,22 +23,76 @@ class _RegisterState extends State<Register> {
   final TextEditingController _role = TextEditingController();
   bool obscured = true;
 
+  Future<void> registration(String name, String email, String password,
+      String confirmPassword, String role) async {
+    if (password != confirmPassword) {
+      FunctionsUtility.showToastMessage('Password does not match!', Colors.red);
+      return;
+    }
+
+    bool isValidEmail(String email) {
+      final RegExp regex =
+          RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$");
+      return regex.hasMatch(email);
+    }
+
+    if (email.isEmpty || !isValidEmail(email)) {
+      FunctionsUtility.showToastMessage(
+          'Please enter a valid email.', Colors.red);
+      return;
+    }
+    if (password.isEmpty || password.length < 6) {
+      FunctionsUtility.showToastMessage(
+          'Password should be at least 6 characters.', Colors.red);
+      return;
+    }
+
+    final Map<String, String> requestData = {
+      "name": name,
+      "email": email,
+      "password": password,
+      "role": role.toLowerCase(),
+    };
+
+    debugPrint(requestData.toString());
+
+    final response = await http.post(
+      Uri.parse('http://192.168.0.199:3000/api/v1/signup'),
+      body: json.encode(requestData),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    debugPrint(response.statusCode.toString());
+    debugPrint(response.body.toString());
+
+    if (response.statusCode == 201) {
+      final data = json.decode(response.body);
+      debugPrint(data.toString());
+      FunctionsUtility.showToastMessage(
+          'Registration Successful.', Colors.green);
+      Navigator.pop(context);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => Login()));
+      return;
+    } else {
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
         Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primaryColor,
-                  AppColors.primaryColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            )
-        ),
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primaryColor,
+              AppColors.primaryColor,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        )),
         Column(
           children: [
             Container(
@@ -40,10 +100,7 @@ class _RegisterState extends State<Register> {
               height: MediaQuery.of(context).size.height * 0.4,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryColor,
-                    AppColors.primaryColor
-                  ],
+                  colors: [AppColors.primaryColor, AppColors.primaryColor],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -71,21 +128,26 @@ class _RegisterState extends State<Register> {
                       child: Column(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(top: 40.0, left: 8.0, right: 8.0, bottom: 24),
+                            padding: EdgeInsets.only(
+                                top: 40.0, left: 8.0, right: 8.0, bottom: 24),
                             child: Text('Create New Account',
                                 style: TextStyle(
-                                    fontSize: 24.0, fontWeight: FontWeight.bold)),
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold)),
                           ),
 
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0, vertical: 8.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.4,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         'First Name',
@@ -100,14 +162,20 @@ class _RegisterState extends State<Register> {
                                         decoration: InputDecoration(
                                           filled: true,
                                           fillColor: AppColors.textFieldColor,
-                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 12.0,
+                                                  vertical: 4.0),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8.0),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
                                             borderSide: BorderSide.none,
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8.0),
-                                            borderSide: const BorderSide(color: Colors.blue),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            borderSide: const BorderSide(
+                                                color: Colors.blue),
                                           ),
                                         ),
                                       ),
@@ -115,9 +183,11 @@ class _RegisterState extends State<Register> {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.4,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         'Last Name',
@@ -132,14 +202,20 @@ class _RegisterState extends State<Register> {
                                         decoration: InputDecoration(
                                           filled: true,
                                           fillColor: AppColors.textFieldColor,
-                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 12.0,
+                                                  vertical: 4.0),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8.0),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
                                             borderSide: BorderSide.none,
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8.0),
-                                            borderSide: const BorderSide(color: Colors.blue),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            borderSide: const BorderSide(
+                                                color: Colors.blue),
                                           ),
                                         ),
                                       ),
@@ -151,7 +227,8 @@ class _RegisterState extends State<Register> {
                           ),
                           const SizedBox(height: 8.0),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0, vertical: 4.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -168,14 +245,16 @@ class _RegisterState extends State<Register> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0, vertical: 8.0),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide.none,
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: const BorderSide(color: Colors.blue),
+                                      borderSide:
+                                          const BorderSide(color: Colors.blue),
                                     ),
                                   ),
                                 ),
@@ -184,7 +263,8 @@ class _RegisterState extends State<Register> {
                           ),
                           const SizedBox(height: 8.0),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0, vertical: 4.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -203,7 +283,8 @@ class _RegisterState extends State<Register> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0, vertical: 8.0),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         obscured
@@ -222,7 +303,8 @@ class _RegisterState extends State<Register> {
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: const BorderSide(color: Colors.blue),
+                                      borderSide:
+                                          const BorderSide(color: Colors.blue),
                                     ),
                                   ),
                                 ),
@@ -231,7 +313,8 @@ class _RegisterState extends State<Register> {
                           ),
                           const SizedBox(height: 8.0),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0, vertical: 4.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -250,7 +333,8 @@ class _RegisterState extends State<Register> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0, vertical: 8.0),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         obscured
@@ -269,7 +353,8 @@ class _RegisterState extends State<Register> {
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: const BorderSide(color: Colors.blue),
+                                      borderSide:
+                                          const BorderSide(color: Colors.blue),
                                     ),
                                   ),
                                 ),
@@ -279,7 +364,8 @@ class _RegisterState extends State<Register> {
                           const SizedBox(height: 8.0),
                           // Role DropDown Box
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0, vertical: 4.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -292,49 +378,67 @@ class _RegisterState extends State<Register> {
                                 ),
                                 const SizedBox(height: 4.0),
                                 DropdownButtonFormField<String>(
-                                  value: _role.text.isEmpty ? 'Admin' : _role.text,
+                                  value:
+                                      _role.text.isEmpty ? 'Admin' : _role.text,
                                   decoration: InputDecoration(
                                     filled: true,
-                                    fillColor: AppColors.textFieldColor, // Replace with your color
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    fillColor: AppColors
+                                        .textFieldColor, // Replace with your color
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0, vertical: 8.0),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide.none,
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: const BorderSide(color: Colors.blue),
+                                      borderSide:
+                                          const BorderSide(color: Colors.blue),
                                     ),
                                   ),
                                   items: ['Admin', 'User']
-                                      .map<DropdownMenuItem<String>>((String value) {
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value),
                                     );
                                   }).toList(),
                                   onChanged: (String? newValue) {
-                                    // Handle the selected value
+                                    setState(() {
+                                      _role.text = newValue!;
+                                    });
                                   },
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 24.0),
-                          Container(
-                            height: 50,
-                            width: 250,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: AppColors.primaryColor,
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                          GestureDetector(
+                            onTap: () {
+                              registration(
+                                '${_firstName.text} ${_lastName.text}',
+                                _email.text,
+                                _password.text,
+                                _confirmPassword.text,
+                                _role.text,
+                              );
+                            },
+                            child: Container(
+                              height: 50,
+                              width: 250,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.primaryColor,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
@@ -346,7 +450,7 @@ class _RegisterState extends State<Register> {
                               const Text(
                                 "Don't have an account?",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(120, 107,203, 1),
+                                  color: Color.fromRGBO(120, 107, 203, 1),
                                   fontSize: 16,
                                 ),
                               ),
@@ -354,7 +458,8 @@ class _RegisterState extends State<Register> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const Register()),
+                                    MaterialPageRoute(
+                                        builder: (_) => const Register()),
                                   );
                                 },
                                 child: const Text(
@@ -381,4 +486,3 @@ class _RegisterState extends State<Register> {
     );
   }
 }
-

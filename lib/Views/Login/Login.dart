@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:home_automation_system/Models/User.dart';
 import 'package:home_automation_system/Utils/Colors.dart';
+import 'package:home_automation_system/Views/HomePage/HomePage.dart';
 import 'package:home_automation_system/Views/Register/Register.dart';
+import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -13,22 +18,48 @@ class _LoginState extends State<Login> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   bool obscured = true;
+
+  Future<bool> login(String email, String password) async {
+    final Map<String, String> requestData = {
+      "email": email,
+      "password": password,
+    };
+
+    final response = await http.post(
+      Uri.parse('http://192.168.0.199:3000/api/v1/login'),
+      body: json.encode(requestData),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      debugPrint(data.toString());
+      final user = User.fromJson(data['user']);
+      debugPrint(user.toString());
+
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => HomePage(user: user)));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
         Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primaryColor,
-                AppColors.primaryColor,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          )
-        ),
+            decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primaryColor,
+              AppColors.primaryColor,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        )),
         Column(
           children: [
             Container(
@@ -36,10 +67,7 @@ class _LoginState extends State<Login> {
               height: MediaQuery.of(context).size.height * 0.4,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryColor,
-                    AppColors.primaryColor
-                  ],
+                  colors: [AppColors.primaryColor, AppColors.primaryColor],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -65,14 +93,15 @@ class _LoginState extends State<Login> {
                     child: Column(
                       children: [
                         const Padding(
-                          padding: EdgeInsets.only(top: 40.0, left: 8.0, right: 8.0, bottom: 24),
+                          padding: EdgeInsets.only(
+                              top: 40.0, left: 8.0, right: 8.0, bottom: 24),
                           child: Text('Login to Your Account',
                               style: TextStyle(
                                   fontSize: 24.0, fontWeight: FontWeight.bold)),
                         ),
-
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0, vertical: 8.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -86,19 +115,20 @@ class _LoginState extends State<Login> {
                               ),
                               const SizedBox(height: 4.0),
                               TextFormField(
-
                                 controller: _email,
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: AppColors.textFieldColor,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0, vertical: 4.0),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.0),
-                                    borderSide: const BorderSide(color: Colors.blue),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue),
                                   ),
                                 ),
                               ),
@@ -107,7 +137,8 @@ class _LoginState extends State<Login> {
                         ),
                         const SizedBox(height: 8.0),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0, vertical: 4.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -127,7 +158,8 @@ class _LoginState extends State<Login> {
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: AppColors.textFieldColor,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0, vertical: 8.0),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       obscured
@@ -146,7 +178,8 @@ class _LoginState extends State<Login> {
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.0),
-                                    borderSide: const BorderSide(color: Colors.blue),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue),
                                   ),
                                 ),
                               ),
@@ -157,26 +190,36 @@ class _LoginState extends State<Login> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
-                              child: Text("Forget Password?", style: TextStyle(color: Color.fromRGBO(120, 107,203, 1)),),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 24.0, vertical: 4.0),
+                              child: Text(
+                                "Forget Password?",
+                                style: TextStyle(
+                                    color: Color.fromRGBO(120, 107, 203, 1)),
+                              ),
                             )
                           ],
                         ),
                         const SizedBox(height: 24.0),
-                        Container(
-                          height: 50,
-                          width: 250,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: AppColors.primaryColor,
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'Sign In',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                        GestureDetector(
+                          onTap: () {
+                            login(_email.text, _password.text);
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 250,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.primaryColor,
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
@@ -188,7 +231,7 @@ class _LoginState extends State<Login> {
                             const Text(
                               "Don't have an account?",
                               style: TextStyle(
-                                color: Color.fromRGBO(120, 107,203, 1),
+                                color: Color.fromRGBO(120, 107, 203, 1),
                                 fontSize: 16,
                               ),
                             ),
@@ -196,7 +239,8 @@ class _LoginState extends State<Login> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const Register()),
+                                  MaterialPageRoute(
+                                      builder: (_) => const Register()),
                                 );
                               },
                               child: const Text(
