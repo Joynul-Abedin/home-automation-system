@@ -12,7 +12,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
-
+  bool obscured = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +86,7 @@ class _LoginState extends State<Login> {
                               ),
                               const SizedBox(height: 4.0),
                               TextFormField(
+
                                 controller: _email,
                                 decoration: InputDecoration(
                                   filled: true,
@@ -120,11 +121,25 @@ class _LoginState extends State<Login> {
                               ),
                               const SizedBox(height: 4.0),
                               TextFormField(
+                                obscureText: obscured,
+                                obscuringCharacter: '*',
                                 controller: _password,
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: AppColors.textFieldColor,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      obscured
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        obscured = !obscured;
+                                      });
+                                    },
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                     borderSide: BorderSide.none,

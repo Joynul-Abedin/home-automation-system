@@ -15,6 +15,7 @@ class _RegisterState extends State<Register> {
   final TextEditingController _password = TextEditingController();
   final TextEditingController _confirmPassword = TextEditingController();
   final TextEditingController _role = TextEditingController();
+  bool obscured = true;
 
   @override
   Widget build(BuildContext context) {
@@ -196,11 +197,25 @@ class _RegisterState extends State<Register> {
                                 ),
                                 const SizedBox(height: 4.0),
                                 TextFormField(
+                                  obscureText: obscured,
+                                  obscuringCharacter: '*',
                                   controller: _password,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        obscured
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          obscured = !obscured;
+                                        });
+                                      },
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide.none,
@@ -229,11 +244,25 @@ class _RegisterState extends State<Register> {
                                 ),
                                 const SizedBox(height: 4.0),
                                 TextFormField(
+                                  obscureText: obscured,
+                                  obscuringCharacter: '*',
                                   controller: _confirmPassword,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.textFieldColor,
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        obscured
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          obscured = !obscured;
+                                        });
+                                      },
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide.none,
