@@ -155,6 +155,39 @@ class _RegisterState extends State<Register> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
+                                  'Email',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 4.0),
+                                TextFormField(
+                                  controller: _email,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: AppColors.textFieldColor,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: const BorderSide(color: Colors.blue),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
                                   'Password',
                                   style: TextStyle(
                                     fontSize: 16,
