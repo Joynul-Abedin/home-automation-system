@@ -7,6 +7,9 @@ import 'package:home_automation_system/Views/HomePage/HomePage.dart';
 import 'package:home_automation_system/Views/Register/Register.dart';
 import 'package:http/http.dart' as http;
 
+import '../../Utils/Constants.dart';
+import '../../Utils/Functions.dart';
+
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -26,7 +29,7 @@ class _LoginState extends State<Login> {
     };
 
     final response = await http.post(
-      Uri.parse('http://192.168.0.199:3000/api/v1/login'),
+      Uri.parse('${Util.baseUrl}/login'),
       body: json.encode(requestData),
       headers: {'Content-Type': 'application/json'},
     );
@@ -36,11 +39,15 @@ class _LoginState extends State<Login> {
       debugPrint(data.toString());
       final user = User.fromJson(data['user']);
       debugPrint(user.toString());
-
+      FunctionsUtility.showToastMessage(
+          'Login Successful', Colors.green);
       Navigator.push(
           context, MaterialPageRoute(builder: (_) => HomePage(user: user)));
       return true;
     } else {
+      final errorData = json.decode(response.body);
+      final errorMessage = errorData['message'] ?? 'Unknown error occurred';
+      FunctionsUtility.showToastMessage(errorMessage, Colors.red);
       return false;
     }
   }

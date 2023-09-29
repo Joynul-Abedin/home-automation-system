@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:home_automation_system/Utils/Colors.dart';
+import 'package:home_automation_system/Utils/Constants.dart';
 import 'package:home_automation_system/Utils/Functions.dart';
 import 'package:http/http.dart' as http;
 
@@ -57,7 +58,7 @@ class _RegisterState extends State<Register> {
     debugPrint(requestData.toString());
 
     final response = await http.post(
-      Uri.parse('http://192.168.0.199:3000/api/v1/signup'),
+      Uri.parse('${Util.baseUrl}/signup'),
       body: json.encode(requestData),
       headers: {'Content-Type': 'application/json'},
     );
@@ -74,6 +75,8 @@ class _RegisterState extends State<Register> {
       Navigator.push(context, MaterialPageRoute(builder: (_) => Login()));
       return;
     } else {
+      FunctionsUtility.showToastMessage(
+          '${response.body}', Colors.green);
       return;
     }
   }
