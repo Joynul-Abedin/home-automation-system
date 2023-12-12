@@ -58,7 +58,7 @@ class _RegisterState extends State<Register> {
     debugPrint(requestData.toString());
 
     final response = await http.post(
-      Uri.parse('${Util.baseUrl}/signup'),
+      Uri.parse('${Constants.baseUrl}/signup'),
       body: json.encode(requestData),
       headers: {'Content-Type': 'application/json'},
     );

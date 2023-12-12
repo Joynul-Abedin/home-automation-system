@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:home_automation_system/Models/User.dart';
 import 'package:home_automation_system/Utils/Colors.dart';
-import 'package:home_automation_system/Utils/SharedPrefService.dart';
 import 'package:home_automation_system/Views/HomePage/HomePage.dart';
 import 'package:home_automation_system/Views/IssueTraking/IssueTrakerPage.dart';
 import 'package:home_automation_system/Views/Register/Register.dart';
@@ -12,21 +11,19 @@ import 'package:http/http.dart' as http;
 import '../../Utils/Constants.dart';
 import '../../Utils/Functions.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class CreateIssuePage extends StatefulWidget {
+  const CreateIssuePage({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<CreateIssuePage> createState() => _CreateIssuePageState();
 }
 
-class _LoginState extends State<Login> {
+class _CreateIssuePageState extends State<CreateIssuePage> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   bool obscured = true;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final sharedPreference = SharedPrefService.pref;
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> saveIssue(String email, String password) async {
     final Map<String, String> requestData = {
       "email": email,
       "password": password,
@@ -45,7 +42,6 @@ class _LoginState extends State<Login> {
       debugPrint(user.toString());
       FunctionsUtility.showToastMessage(
           'Login Successful', Colors.green);
-      sharedPreference.setBool(Constants.IS_LOGGEDIN, true);
       Navigator.push(
           context, MaterialPageRoute(builder: (_) => const IssueTrackerScreen()));
       return true;
@@ -63,15 +59,15 @@ class _LoginState extends State<Login> {
       body: Stack(children: [
         Container(
             decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primaryColor,
-              AppColors.primaryColor,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        )),
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primaryColor,
+                  AppColors.primaryColor,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            )),
         Column(
           children: [
             Container(
@@ -140,7 +136,7 @@ class _LoginState extends State<Login> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                     borderSide:
-                                        const BorderSide(color: Colors.blue),
+                                    const BorderSide(color: Colors.blue),
                                   ),
                                 ),
                               ),
@@ -191,7 +187,7 @@ class _LoginState extends State<Login> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                     borderSide:
-                                        const BorderSide(color: Colors.blue),
+                                    const BorderSide(color: Colors.blue),
                                   ),
                                 ),
                               ),
@@ -215,7 +211,7 @@ class _LoginState extends State<Login> {
                         const SizedBox(height: 24.0),
                         GestureDetector(
                           onTap: () {
-                            login(_email.text, _password.text);
+                            // saveIssue(_email.text, _password.text);
                           },
                           child: Container(
                             height: 50,
@@ -235,36 +231,6 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 24.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Don't have an account?",
-                              style: TextStyle(
-                                color: Color.fromRGBO(120, 107, 203, 1),
-                                fontSize: 16,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const Register()),
-                                );
-                              },
-                              child: const Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
